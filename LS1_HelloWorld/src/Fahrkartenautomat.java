@@ -1,160 +1,168 @@
 import java.util.Scanner;
 
 class Fahrkartenautomat {
-	
-	public static void main(String[] args) {
 
+	public static double fahrkartenbestellungErfassen() {
+		double[] ticketpreise = {3.00,3.50,3.80,2.00,8.60,9.20,10.00,9.40,12.60,13.80,25.50,26.00,26.50,};   
+		int[] anzahlTickets = new int[ticketpreise.length];
+		
+		double gesamtPreis = 0.0;
+		int auswahl;
+		Scanner tastatur = new Scanner(System.in);
+		
+		System.out.println(" Herzlich Willkommen!\n");
+		do {
+			auswahl = fahrkartenMenue();
+			
+			if (auswahl == 0)
+				for (int i=0 ; i < ticketpreise.length ; i++)
+					gesamtPreis += ticketpreise[i] * anzahlTickets[i]; 
+			else
+				erfasseTicketAnzahl(anzahlTickets, auswahl);  
+			
+		}while(auswahl!=0);
+		
+		return gesamtPreis;
+		
+	}
+
+	public static void erfasseTicketAnzahl(int[] anzahlTickets, int auswahl) {
+	  Scanner tastatur = new Scanner(System.in);
+	  System.out.print("\n  Anzahl der Tickets: ");
+      anzahlTickets[auswahl-1] += tastatur.nextInt();
+  }
+
+	public static int fahrkartenMenue() {
+        String[] eintraege = { "Einzelfahrschein AB ", 
+        					   "Einzelfahrschein BC ", 
+        					   "Einzelfahrschein ABC",
+        					   "Kurzstrecke AB",
+        					   "Tageskarte Regeltarif AB",
+        					   "Tageskarte Regeltarif BC",
+        					   "Tageskarte Regeltarif ABC",
+        					   "4-Fahrten-Karte AB",
+        					   "4-Fahrten-Karte BC",
+        					   "4-Fahrten-Karte ABC",
+        					   "Kleingruppen-Tageskarte Berlin AB",
+        					   "Kleingruppen-Tageskarte Berlin BC ",
+        					   "Kleingruppen-Tageskarte Berlin ABC "
+        					};
+    int auswahl;
+    boolean istEingabeKorrekt = false;
+    Scanner tastatur = new Scanner(System.in);
+
+    do {
+      System.out.println("\n  Wählen Sie eine Fahrkarte aus:");
+      for (int i = 0; i < eintraege.length ; i++)
+        System.out.println("    "+eintraege[i]+" ("+ (i+1) + ")");  
+      System.out.println("\n    Bezahlen (0)\n");
+      System.out.print("  Ihre Wahl: ");
+      auswahl = tastatur.nextInt();
+      if (auswahl <= eintraege.length && auswahl >= 0)
+        istEingabeKorrekt = true;
+      else
+        System.out.println("  >>falsche Eingabe. Bitte wiederholen.<<");
+        
+
+    } while (!istEingabeKorrekt);
+    return auswahl;
+  }
+
+	public static double fahrkartenBezahlen(double zuZahlenderBetrag) {
+		double eingeworfeneMünze;
+		double eingezahlterGesamtbetrag = 0.0;
 		Scanner tastatur = new Scanner(System.in);
 
-		double zuZahlenderBetrag = 0.0;
-		int AnzahlTicket;
-		int ausgesuchteKarte;
-		boolean karte = false;
-		double eingezahlterGesamtbetrag;
-		double eingeworfeneMuenze;
-		double rueckgabebetrag;
-		double nochZuZahlen;
+		while (eingezahlterGesamtbetrag < zuZahlenderBetrag) {
+			System.out.format("  Noch zu zahlen: %4.2f € %n", (zuZahlenderBetrag - eingezahlterGesamtbetrag));
+			System.out.print("  Eingabe (mind. 5Ct, höchstens 10 Euro): ");
+			eingeworfeneMünze = tastatur.nextDouble();
+			eingezahlterGesamtbetrag += eingeworfeneMünze;
+		}
+		return eingezahlterGesamtbetrag - zuZahlenderBetrag;
+	}
 
-		// 1 Fahrkarte aussuchen. Bei ungültiger Eingabe wiederholt sich die Schleife.  
-		while (karte == false) 
-		{
-			System.out.print("Fahrkartenbestellvorgang:\r\n"
-					+ "=========================\r\n\n"
-					+ "Wählen Sie ihre Wunschfahrkarte für Berlin AB aus:\r"
-					+ "Kurzstrecke AB [2,00 Euro] (1)\r"
-					+ "Einzelfahrschein AB [3,00 Euro] (2)\r"
-					+ "Tageskarte AB [8,80 Euro] (3)\r"
-					+ "4-Fahrten-Karte AB [9,40 Euro] (4)\n\n");
-			
-			ausgesuchteKarte = tastatur.nextInt();
-			
-			if (ausgesuchteKarte < 1 || ausgesuchteKarte > 4)
-			{
-				System.out.print(">>> Bitte wählen Sie eine gültige Ausgabe. <<<\n");
-			}
-			
-			switch(ausgesuchteKarte)
-			{
-				case 1: 
-				zuZahlenderBetrag = 2.00; 
-				karte = true;
-				break;
-				case 2:
-				zuZahlenderBetrag = 3.00;
-				karte = true;
-				break;
-				case 3: 
-				zuZahlenderBetrag = 8.80;
-				karte = true;
-				break;
-				case 4:
-				zuZahlenderBetrag = 9.40;
-				karte = true;
-				break;
-			}
-		}
-		
-		//AUFGABE A4.2:
-		//Ticketanzahl wird eingegeben, bei ungültiger Eingabe wiederholt sich die Schleife:
-		AnzahlTicket = 0; 
-		while (AnzahlTicket < 1 ||  AnzahlTicket > 10)
-		{
-			System.out.print("Anzahl der Fahrkarten: ");
-			AnzahlTicket = tastatur.nextInt();
-			if (AnzahlTicket < 1 || AnzahlTicket > 10)
-			{
-				System.out.print(">>> Fehlerhafte Eingabe. Bitte geben Sie eine Zahl zwischen 1 und 10 ein.<<<\n\n");
-			}
-		}		
-		
-		zuZahlenderBetrag = zuZahlenderBetrag * AnzahlTicket;
-		
-		// 2 Geldeinwurf
-		eingezahlterGesamtbetrag = 0.0;
-		nochZuZahlen = 0.0;
-		while (eingezahlterGesamtbetrag < zuZahlenderBetrag) 
-		{
-			nochZuZahlen = zuZahlenderBetrag - eingezahlterGesamtbetrag;
-			System.out.printf("Noch zu zahlender Betrag: %.2f Euro\n",nochZuZahlen);
-			System.out.print("Eingabe (mind. 5 Cent, höchstens 2 Euro): ");
-			eingeworfeneMuenze = tastatur.nextDouble();
-			if (eingeworfeneMuenze != 0.05 && eingeworfeneMuenze != 0.1 && eingeworfeneMuenze != 0.2 && eingeworfeneMuenze != 0.5 && eingeworfeneMuenze != 1 && eingeworfeneMuenze != 2 && eingeworfeneMuenze != 5 && eingeworfeneMuenze != 10 && eingeworfeneMuenze != 20 ) 
-			{
-				System.out.print("Kein gültiger Zahlungsbetrag. Bitte erneut versuchen.\n\n");
-			}
-			else
-			{
-				eingezahlterGesamtbetrag = eingezahlterGesamtbetrag + eingeworfeneMuenze;
-			}
-		}
-		
-		// 3 Fahrscheinausgabe
-		/*if (AnzahlTicket == 1) {
-		System.out.println("\nFahrschein wird ausgegeben");
-		} else {
-			System.out.println("\nFahrscheine werden ausgegeben");
-		}*/
-		
-		//Verkürzung:
-			System.out.println(AnzahlTicket == 1 ? "\nFahrschein wird ausgegeben" : "Fahrscheine werden ausgegeben");
-		for (int i = 0; i < 8; i++) 
-		{
+	public static void fahrkartenAusgeben() {
+		System.out.println("\n  Fahrschein wird ausgegeben");
+		System.out.print("  ");
+		for (int i = 0; i < 8; i++) {
 			System.out.print("=");
-			try 
+			warte(255);
+		}
+		System.out.println("\n");
+	}
+
+	public static void warte(int milisekunde) {
+		try {
+			Thread.sleep(milisekunde);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	public static void rückgeldAusgeben(double rückgabebetrag) {
+
+		if (rückgabebetrag > 0.0) {
+			System.out.format("  Der Rückgabebetrag in Höhe von %4.2f € %n", rückgabebetrag);
+			System.out.println("  wird in folgenden Münzen ausgezahlt:");
+
+			while (rückgabebetrag >= 2.0) {// 2 EURO-Münzen
+				münzeAusgeben(2, "EURO");
+				rückgabebetrag -= 2.0;
+			}
+			while (rückgabebetrag >= 1.0) {// 1 EURO-Münzen
+				münzeAusgeben(1, "EURO");
+				rückgabebetrag -= 1.0;
+			}
+			while (rückgabebetrag >= 0.5) // 50 CENT-Münzen
 			{
-				Thread.sleep(200);
-			} 
-			catch (InterruptedException e) 
+				münzeAusgeben(50, "CENT");
+				rückgabebetrag -= 0.5;
+			}
+			while (rückgabebetrag >= 0.2) // 20 CENT-Münzen
 			{
-				e.printStackTrace();
+				münzeAusgeben(20, "CENT");
+				rückgabebetrag -= 0.2;
+			}
+			while (rückgabebetrag >= 0.1) // 10 CENT-Müzen
+			{
+				münzeAusgeben(10, "CENT");
+				rückgabebetrag -= 0.1;
+			}
+			while (rückgabebetrag >= 0.05)// 5 CENT-Münzen
+			{
+				münzeAusgeben(5, "CENT");
+				rückgabebetrag -= 0.05;
 			}
 		}
-		System.out.println("\n\n");
-		
-		// 4 Rückgeldberechnung und -ausgabe
-		rueckgabebetrag = eingezahlterGesamtbetrag - zuZahlenderBetrag;
-		if (rueckgabebetrag > 0.0) 
-		{
-			System.out.printf("Der Rückgabebetrag in Höhe von %.2f Euro\n", rueckgabebetrag);
-			System.out.println("wird in folgenden Münzen ausgezahlt:");
+	}
 
-			while (rueckgabebetrag >= 2.0) 
-			{ // 2-Euro-Münzen
-				System.out.println("2 Euro");
-				rueckgabebetrag = rueckgabebetrag - 2.0;
-			}
-			while (rueckgabebetrag >= 1.0) 
-			{ // 1-Euro-Münzen
-				System.out.println("1 Euro");
-				rueckgabebetrag = rueckgabebetrag - 1.0;
-			}
-			while (rueckgabebetrag >= 0.49) 
-			{ // 50-Cent-Münzen
-				System.out.println("50 Cent");
-				rueckgabebetrag = rueckgabebetrag - 0.5;
-			}
-			while (rueckgabebetrag >= 0.19) 
-			{ // 20-Cent-Münzen
-				System.out.println("20 Cent");
-				rueckgabebetrag = rueckgabebetrag - 0.2;
-			}
-			while (rueckgabebetrag >= 0.09) { // 10-Cent-Münzen
-				System.out.println("10 Cent");
-				rueckgabebetrag = rueckgabebetrag - 0.1;
-			}
-			while (rueckgabebetrag >= 0.049) { // 5-Cent-Münzen
-				System.out.println("5 Cent");
-				rueckgabebetrag = rueckgabebetrag - 0.05;
-			}
-			while (rueckgabebetrag >= 0.009) { // 1-Cent-Münzen
-				System.out.println("1 Cent");
-				rueckgabebetrag = rueckgabebetrag - 0.01;
-			}
-		}
+	public static void münzeAusgeben(int betrag, String einheit) {
 
-		System.out.println("\nVergessen Sie nicht, den Fahrschein\n" + "vor Fahrtantritt entwerten zu lassen!\n"
-				+ "Wir wünschen Ihnen eine gute Fahrt.");
+		System.out.println("                 * * *        ");
+		System.out.println("               *       *      ");
+		System.out.format("              *    %-2s   *     %n", betrag);
+		System.out.format("              *   %4s  *     %n", einheit);
+		System.out.println("               *       *      ");
+		System.out.println("                 * * *        ");
 
-		tastatur.close();
+	}
+
+	public static void main(String[] args) {
+
+		double zuZahlenderBetrag;
+		double rückgabebetrag;
+		do {
+
+			zuZahlenderBetrag = fahrkartenbestellungErfassen();
+			rückgabebetrag = fahrkartenBezahlen(zuZahlenderBetrag);
+			fahrkartenAusgeben();
+			rückgeldAusgeben(rückgabebetrag);
+
+			System.out.println("\n  Vergessen Sie nicht, den Fahrschein\n" + "  vor Fahrtantritt entwerten zu lassen!\n"
+					+ "  Wir wünschen Ihnen eine gute Fahrt.\n\n");
+		} while (true);
+
 	}
 }
